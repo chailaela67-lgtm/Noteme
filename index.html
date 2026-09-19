@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<meta name="theme-color" content="#ffd9e8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Noteme">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon-180.png">
+<title>Noteme</title>
+<style>
+:root{
+  --pink:#ffd9e8;
+  --pink-2:#f7b6d2;
+  --accent:#e8629b;
+  --accent-dark:#c9457d;
+  --ink:#2b2230;
+  --soft:#fff5fa;
+  --muted:#9a8fa3;
+  --radius:22px;
+  --shadow:0 6px 20px rgba(206,124,166,.16);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Poppins,Roboto,"Helvetica Neue",sans-serif;
+  background:var(--soft);color:var(--ink);
+  overscroll-behavior-y:none;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit}
+
+/* ---------- HOME ---------- */
+#home{min-height:100%;display:flex;flex-direction:column}
+.home-head{
+  position:sticky;top:0;z-index:20;
+  padding:14px 14px 12px;
+  background:linear-gradient(180deg,#ffeaf3 0%,rgba(255,245,250,.94) 72%,rgba(255,245,250,0));
+  backdrop-filter:blur(8px);
+}
+.head-row{display:flex;align-items:center;gap:12px}
+.menu-btn{
+  width:46px;height:46px;border-radius:16px;flex:0 0 auto;
+  background:#fff;box-shadow:var(--shadow);
+  display:flex;align-items:center;justify-content:center;
+}
+.menu-btn svg{width:24px;height:24px;stroke:var(--accent-dark);stroke-width:2.4;stroke-linecap:round}
+.brand{
+  font-size:23px;font-weight:800;letter-spacing:-.4px;
+  display:flex;align-items:center;gap:8px;
+}
+.brand .flower{width:24px;height:24px}
+.head-sub{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:-2px}
+
+.search-wrap{position:relative;margin-top:12px}
+.search-wrap input{
+  width:100%;padding:13px 40px 13px 42px;border-radius:16px;
+  border:2px solid #fbe6f0;background:#fff;outline:none;
+  font-size:15px;font-weight:650;color:var(--ink);
+  box-shadow:0 3px 12px rgba(206,124,166,.1);
+}
+.search-wrap input:focus{border-color:var(--pink-2)}
+.search-wrap .mag{
+  position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  font-size:15px;opacity:.45;pointer-events:none;
+}
+.search-wrap .clr{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  width:28px;height:28px;border-radius:9px;background:#fdeef5;color:var(--accent-dark);
+  font-size:13px;display:none;align-items:center;justify-content:center;
+}
+.search-wrap.has .clr{display:flex}
+
+#notesList{
+  padding:6px 10px 120px;
+  display:flex;flex-direction:column;gap:14px;
+  width:100%;
+}
+.note-card{
+  width:100%;
+  border-radius:var(--radius);
+  padding:16px 17px 15px;
+  box-shadow:var(--shadow);
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+  transition:transform .12s ease, box-shadow .18s ease;
+  min-height:96px;
+  display:block;
+}
+.note-card:active{transform:scale(.985)}
+.note-card.dragging{
+  opacity:.94;transform:scale(1.03) rotate(-.6deg);
+  box-shadow:0 20px 44px rgba(120,60,95,.34);z-index:50;
+}
+.grip{
+  position:absolute;top:12px;right:12px;width:30px;height:30px;
+  border-radius:9px;background:rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;letter-spacing:1px;opacity:.75;
+}
+.nc-top{display:flex;align-items:center;gap:8px;margin-bottom:7px;padding-right:34px}
+.nc-type{
+  font-size:10.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;
+  padding:4px 9px;border-radius:999px;
+  background:rgba(255,255,255,.55);
+}
+.nc-top .spacer{flex:1}
+.nc-dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.75)}
+.nc-title{font-size:19px;font-weight:750;line-height:1.25;letter-spacing:-.2px;margin:0 0 6px}
+.nc-body{font-size:14px;line-height:1.5;opacity:.85;max-height:66px;overflow:hidden;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
+mark{background:#ffe08a;color:inherit;border-radius:4px;padding:0 2px}
+
+.mini-wrap{display:flex;align-items:center;gap:14px}
+.mini-gauge{position:relative;width:74px;height:74px;flex:0 0 auto}
+.mini-gauge .pct{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;
+}
+.mini-info{flex:1;min-width:0}
+.mini-total{font-size:15.5px;font-weight:750;line-height:1.35;word-break:break-word}
+.mini-sub{font-size:12px;opacity:.8;margin-top:3px;font-weight:600}
+
+.bal-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.bal-num{font-size:24px;font-weight:820;letter-spacing:-.5px}
+.bal-label{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;opacity:.7}
+.bal-chips{display:flex;gap:7px;margin-top:10px;flex-wrap:wrap}
+.chip{font-size:11.5px;font-weight:750;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.55)}
+
+.empty{text-align:center;padding:70px 30px;color:var(--muted)}
+.empty .big{font-size:44px;margin-bottom:10px}
+.empty p{font-size:14px;line-height:1.6;margin:6px 0 0}
+
+/* ---------- DRAWER ---------- */
+#scrim{
+  position:fixed;inset:0;background:rgba(43,34,48,.42);backdrop-filter:blur(2px);
+  opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:60;
+}
+#scrim.on{opacity:1;pointer-events:auto}
+#drawer{
+  position:fixed;top:0;left:0;bottom:0;width:min(84vw,340px);
+  background:#fff;z-index:70;
+  transform:translateX(-102%);transition:transform .3s cubic-bezier(.32,.72,.28,1);
+  border-radius:0 26px 26px 0;
+  box-shadow:8px 0 34px rgba(120,60,95,.18);
+  display:flex;flex-direction:column;padding:22px 16px 18px;
+  overflow-y:auto;
+}
+#drawer.on{transform:translateX(0)}
+.dr-head{display:flex;align-items:center;gap:11px;margin-bottom:6px}
+.dr-icon{width:52px;height:52px;border-radius:16px;box-shadow:0 6px 16px rgba(206,124,166,.28);flex:0 0 auto}
+.dr-title{font-size:19px;font-weight:820;letter-spacing:-.3px}
+.dr-sub{font-size:11.5px;color:var(--muted);font-weight:600}
+.dr-sec{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:20px 0 9px}
+.dr-item{
+  display:flex;align-items:center;gap:13px;width:100%;
+  padding:14px 14px;border-radius:17px;text-align:left;
+  margin-bottom:9px;background:var(--soft);transition:background .15s;
+}
+.dr-item:active{background:#ffeaf4}
+.dr-item .ico{
+  width:42px;height:42px;border-radius:14px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;font-size:19px;
+  background:#ffe3f0;
+}
+.dr-item .t{font-size:15.5px;font-weight:750;display:block}
+.dr-item .d{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:1px;display:block}
+.dr-item .chev{margin-left:auto;color:var(--muted);font-size:18px}
+.dr-foot{margin-top:auto;padding-top:18px;font-size:11px;color:var(--muted);text-align:center;line-height:1.5}
+
+/* ---------- FULLSCREEN VIEWS ---------- */
+#view{position:fixed;inset:0;z-index:80;display:none;flex-direction:column;overflow:hidden}
+#view.on{display:flex}
+.v-head{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 12px;flex:0 0 auto;
+}
+.v-btn{
+  width:42px;height:42px;border-radius:14px;flex:0 0 auto;
+  background:rgba(255,255,255,.72);box-shadow:0 4px 12px rgba(206,124,166,.14);
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+}
+.v-title{flex:1;font-size:15px;font-weight:800;letter-spacing:-.2px;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v-scroll{flex:1;overflow-y:auto;padding:0 12px 30px;-webkit-overflow-scrolling:touch}
+
+/* editor */
+#editorTitle{
+  width:100%;border:none;background:transparent;outline:none;
+  font-size:25px;font-weight:800;letter-spacing:-.5px;
+  padding:4px 6px 10px;color:inherit;
+}
+#editorTitle::placeholder{color:currentColor;opacity:.4}
+.ed-body{
+  min-height:52vh;outline:none;
+  font-size:16.5px;line-height:1.65;
+  padding:2px 6px 130px;
+  word-wrap:break-word;
+}
+.ed-body h1{font-size:26px;font-weight:820;margin:.5em 0 .3em;letter-spacing:-.4px}
+.ed-body h2{font-size:21px;font-weight:800;margin:.5em 0 .3em;letter-spacing:-.3px}
+.ed-body input[type=checkbox]{width:19px;height:19px;accent-color:currentColor;vertical-align:-3px;margin-right:8px}
+.ed-body ul,.ed-body ol{margin:.4em 0;padding-left:24px}
+.ed-body:empty:before{content:attr(data-ph);opacity:.4}
+
+#toolbar{
+  position:absolute;left:10px;right:10px;bottom:12px;z-index:5;
+  background:rgba(255,255,255,.96);backdrop-filter:blur(12px);
+  border-radius:20px;box-shadow:0 10px 30px rgba(120,60,95,.2);
+  display:flex;flex-direction:column;gap:2px;padding:8px;
+  opacity:0;transform:translateY(14px);pointer-events:none;transition:.22s;
+}
+#toolbar.on{opacity:1;transform:translateY(0);pointer-events:auto}
+.tb-row{display:flex;gap:4px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.tb-row::-webkit-scrollbar{display:none}
+.tb{
+  min-width:42px;height:40px;border-radius:13px;padding:0 11px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:750;color:#4a3d52;flex:0 0 auto;
+}
+.tb:active,.tb.act{background:#ffe3f0;color:var(--accent-dark)}
+.tb.b{font-weight:900}
+.tb.i{font-style:italic;font-family:Georgia,serif}
+.tb.u{text-decoration:underline;text-underline-offset:3px}
+.tb.sep{width:1px;min-width:1px;height:22px;background:#efe3ea;margin:0 3px;padding:0}
+.color-swatch-btn{
+  width:34px;height:34px;border-radius:50%;border:2.5px solid #fff;
+  box-shadow:0 2px 8px rgba(120,60,95,.28);flex:0 0 auto;margin-left:auto;
+}
+
+/* generic cards */
+.sheet-card{
+  background:#fff;border-radius:20px;padding:16px;
+  box-shadow:0 6px 20px rgba(206,124,166,.14);
+  margin-bottom:13px;
+}
+.tint{background:rgba(255,255,255,.74);backdrop-filter:blur(10px)}
+
+/* savings */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:8px 0 4px}
+.gauge-box{position:relative;width:216px;height:216px}
+.gauge-box svg{width:100%;height:100%;display:block}
+.gauge-center{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;pointer-events:none;
+}
+.gauge-center .pct{font-size:44px;font-weight:850;letter-spacing:-2px;line-height:1}
+.gauge-center .lbl{font-size:11px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;opacity:.65;margin-top:6px}
+.gauge-center .saved{font-size:13px;font-weight:750;opacity:.9;margin-top:8px}
+
+.total-box{text-align:center;padding:14px 12px}
+.total-main{font-size:22px;font-weight:850;letter-spacing:-.5px;line-height:1.3}
+.total-main .sep{opacity:.45;font-weight:700;padding:0 4px}
+.total-left{font-size:13.5px;font-weight:700;margin-top:8px;opacity:.75}
+.bar-mini{height:8px;border-radius:99px;background:rgba(255,255,255,.6);overflow:hidden;margin-top:12px}
+.bar-mini i{display:block;height:100%;border-radius:99px;transition:width .5s cubic-bezier(.3,.9,.3,1)}
+
+.btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:15px;border-radius:17px;
+  font-size:15.5px;font-weight:800;letter-spacing:-.1px;
+  background:var(--accent);color:#fff;
+  box-shadow:0 8px 20px rgba(232,98,155,.32);
+}
+.btn.ghost{background:#fff;color:var(--accent-dark);box-shadow:var(--shadow)}
+.btn.soft{background:#ffe3f0;color:var(--accent-dark);box-shadow:none}
+.btn:active{transform:scale(.985)}
+.btn-row{display:flex;gap:10px;margin-bottom:13px}
+.btn-row .btn{margin:0}
+
+.row-item{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;border-radius:16px;background:#fff;
+  box-shadow:0 3px 12px rgba(206,124,166,.1);
+  margin-bottom:9px;
+}
+.row-item .av{
+  width:38px;height:38px;border-radius:12px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;font-size:17px;background:#ffe3f0;
+}
+.row-item .mid{flex:1;min-width:0}
+.row-item .m1{font-size:14.5px;font-weight:750}
+.row-item .m2{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.row-item .amt{font-size:15px;font-weight:820;letter-spacing:-.2px;text-align:right}
+.amt.pos{color:#1f9d63}
+.amt.neg{color:#e0537d}
+.del-x{
+  width:30px;height:30px;border-radius:10px;background:#fff5f8;color:#c9457d;
+  font-size:15px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+}
+.sec-title{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:18px 4px 10px}
+
+/* balance hero */
+.balance-hero{
+  border-radius:22px;padding:20px;margin-bottom:13px;
+  background:linear-gradient(135deg,#fff 0%,#ffeef6 100%);
+  box-shadow:0 8px 24px rgba(206,124,166,.16);
+}
+.balance-hero .lab{font-size:11px;font-weight:850;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.balance-hero .num{font-size:36px;font-weight:870;letter-spacing:-1.4px;margin-top:6px;line-height:1.1}
+.balance-hero .num.neg{color:#d63a70}
+.hr-row{display:flex;gap:10px;margin-top:14px}
+.hr-box{flex:1;background:rgba(255,255,255,.8);border-radius:14px;padding:11px 12px}
+.hr-box .k{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:var(--muted)}
+.hr-box .v{font-size:16px;font-weight:820;margin-top:3px;letter-spacing:-.3px}
+
+/* chart */
+.seg{display:flex;gap:5px;background:#fbeaf2;border-radius:14px;padding:4px;margin-bottom:14px}
+.seg button{
+  flex:1;padding:9px 4px;border-radius:11px;
+  font-size:12.5px;font-weight:800;color:#9a8fa3;
+}
+.seg button.on{background:#fff;color:var(--accent-dark);box-shadow:0 3px 10px rgba(206,124,166,.18)}
+.chart{margin-top:4px}
+.cbar-row{margin-bottom:12px}
+.cbar-top{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:750;margin-bottom:5px}
+.cbar-top .cv{font-weight:820;letter-spacing:-.2px}
+.cbar-track{height:14px;border-radius:99px;background:#f7edf3;overflow:hidden}
+.cbar-track i{
+  display:block;height:100%;border-radius:99px;
+  transition:width .5s cubic-bezier(.3,.9,.3,1);
+}
+.donut-wrap{display:flex;align-items:center;gap:16px}
+.donut{position:relative;width:150px;height:150px;flex:0 0 auto}
+.donut svg{width:100%;height:100%;display:block;transform:rotate(-90deg)}
+.donut .mid{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;pointer-events:none;
+}
+.donut .mid .a{font-size:15px;font-weight:850;letter-spacing:-.4px}
+.donut .mid .b{font-size:9.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.legend{flex:1;min-width:0}
+.leg{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;margin-bottom:7px}
+.leg i{width:11px;height:11px;border-radius:4px;flex:0 0 auto}
+.leg .lname{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.leg .lval{font-weight:820;color:#5b5062}
+
+/* ---------- MODAL ---------- */
+#modal{position:fixed;inset:0;z-index:120;display:none;align-items:flex-end;justify-content:center}
+#modal.on{display:flex}
+#modal .mk{position:absolute;inset:0;background:rgba(43,34,48,.45);backdrop-filter:blur(3px)}
+.mbox{
+  position:relative;width:100%;max-width:520px;background:#fff;
+  border-radius:26px 26px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));
+  max-height:92vh;overflow-y:auto;
+  animation:up .28s cubic-bezier(.3,.9,.3,1);
+  box-shadow:0 -8px 40px rgba(120,60,95,.25);
+}
+@keyframes up{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mbox h3{margin:0 0 4px;font-size:19px;font-weight:830;letter-spacing:-.3px}
+.mbox .msub{font-size:12.5px;color:var(--muted);font-weight:600;margin-bottom:16px}
+.grab{width:40px;height:5px;border-radius:99px;background:#eee1e9;margin:0 auto 16px}
+.field{margin-bottom:14px}
+.field label{display:block;font-size:11.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.field input,.field select{
+  width:100%;padding:14px 15px;border-radius:15px;border:2px solid #f3e6ee;
+  background:#fdf7fa;font-size:16px;font-weight:700;outline:none;color:var(--ink);
+}
+.field input:focus,.field select:focus{border-color:var(--pink-2);background:#fff}
+.mbtns{display:flex;gap:10px;margin-top:6px}
+.mbtns .btn{flex:1}
+.amt-input{display:flex;align-items:center;gap:6px;border:2px solid #f3e6ee;border-radius:15px;background:#fdf7fa;padding:0 14px}
+.amt-input input{border:none;background:transparent;padding:14px 0;font-size:26px;font-weight:830;width:100%;outline:none;letter-spacing:-.6px}
+.amt-input .cur{font-size:15px;font-weight:800;color:var(--muted)}
+
+.cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.cat{
+  display:flex;align-items:center;gap:7px;
+  padding:10px 13px;border-radius:14px;background:#fdf2f8;border:2px solid transparent;
+  font-size:13.5px;font-weight:750;
+}
+.cat.act{background:#ffe3f0;border-color:var(--accent);color:var(--accent-dark)}
+
+/* colour picker */
+.picker-top{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.preview{width:66px;height:66px;border-radius:20px;box-shadow:0 6px 18px rgba(120,60,95,.22);flex:0 0 auto;border:3px solid #fff}
+.pv-meta .hex{font-size:19px;font-weight:830;letter-spacing:.5px;text-transform:uppercase}
+.pv-meta .hint{font-size:11.5px;color:var(--muted);font-weight:650;margin-top:3px}
+.sv{
+  position:relative;height:170px;border-radius:18px;margin-bottom:16px;overflow:hidden;touch-action:none;cursor:crosshair;
+  background:linear-gradient(to top,#000,rgba(0,0,0,0)),linear-gradient(to right,#fff,rgba(255,255,255,0));
+  background-color:red;
+}
+.sv .knob{position:absolute;width:22px;height:22px;border-radius:50%;border:3px solid #fff;
+  box-shadow:0 2px 8px rgba(0,0,0,.35);transform:translate(-50%,-50%);pointer-events:none}
+.hue-sl{
+  -webkit-appearance:none;appearance:none;width:100%;height:30px;border-radius:99px;outline:none;
+  background:linear-gradient(to right,#f00 0%,#ff0 17%,#0f0 33%,#0ff 50%,#00f 67%,#f0f 83%,#f00 100%);
+  margin-bottom:6px;
+}
+.hue-sl::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:30px;border-radius:50%;
+  background:#fff;border:3px solid #fff;box-shadow:0 2px 10px rgba(0,0,0,.3);cursor:pointer}
+.hue-sl::-moz-range-thumb{width:28px;height:28px;border-radius:50%;background:#fff;border:3px solid #fff;
+  box-shadow:0 2px 10px rgba(0,0,0,.3);cursor:pointer}
+.sl-row{display:flex;justify-content:space-between;font-size:11px;font-weight:750;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:14px}
+.presets{display:flex;flex-wrap:wrap;gap:9px}
+.preset{width:34px;height:34px;border-radius:12px;box-shadow:0 3px 10px rgba(120,60,95,.18);border:2.5px solid #fff}
+
+#toast{
+  position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);
+  background:rgba(43,34,48,.94);color:#fff;font-size:13.5px;font-weight:700;
+  padding:13px 20px;border-radius:16px;z-index:200;opacity:0;pointer-events:none;
+  transition:.28s;max-width:86vw;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25)
+}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+#backupBox{width:100%;height:130px;border-radius:15px;border:2px solid #f3e6ee;background:#fdf7fa;
+  padding:12px;font-size:11.5px;font-family:ui-monospace,Menlo,monospace;outline:none;resize:none;color:#5b5062}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home">
+  <div class="home-head">
+    <div class="head-row">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div>
+        <div class="brand">
+          <svg class="flower" viewBox="0 0 100 100">
+            <g fill="#e8629b">
+              <ellipse cx="50" cy="22" rx="13" ry="19"/>
+              <ellipse cx="50" cy="78" rx="13" ry="19"/>
+              <ellipse cx="22" cy="50" rx="19" ry="13"/>
+              <ellipse cx="78" cy="50" rx="19" ry="13"/>
+              <circle cx="50" cy="50" r="11" fill="#f9c6da"/>
+            </g>
+          </svg>
+          Noteme
+        </div>
+        <div class="head-sub" id="headSub">0 notes</div>
+      </div>
+    </div>
+    <div class="search-wrap" id="searchWrap">
+      <span class="mag">🔍</span>
+      <input id="searchInput" placeholder="Search notes…" autocomplete="off">
+      <button class="clr" id="searchClear">✕</button>
+    </div>
+  </div>
+  <div id="notesList"></div>
+</div>
+
+<!-- DRAWER -->
+<div id="scrim"></div>
+<aside id="drawer">
+  <div class="dr-head">
+    <svg class="dr-icon" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#ffd9e8"/>
+      <g fill="#ffffff">
+        <ellipse cx="50" cy="24" rx="12" ry="18"/>
+        <ellipse cx="50" cy="76" rx="12" ry="18"/>
+        <ellipse cx="24" cy="50" rx="18" ry="12"/>
+        <ellipse cx="76" cy="50" rx="18" ry="12"/>
+        <circle cx="50" cy="50" r="10" fill="#ffd9e8"/>
+        <circle cx="50" cy="50" r="6" fill="#ffffff"/>
+      </g>
+    </svg>
+    <div>
+      <div class="dr-title">Noteme</div>
+      <div class="dr-sub">Notes · Savings · Budget</div>
+    </div>
+  </div>
+
+  <div class="dr-sec">Create</div>
+  <button class="dr-item" data-new="text">
+    <span class="ico">📝</span>
+    <span><span class="t">New Note</span><span class="d">Text, lists, colours</span></span>
+    <span class="chev">›</span>
+  </button>
+  <button class="dr-item" data-new="savings">
+    <span class="ico">🎯</span>
+    <span><span class="t">New Savings Note</span><span class="d">Goal circle &amp; progress</span></span>
+    <span class="chev">›</span>
+  </button>
+  <button class="dr-item" data-new="budget">
+    <span class="ico">💰</span>
+    <span><span class="t">New Budget Note</span><span class="d">Income, expenses, charts</span></span>
+    <span class="chev">›</span>
+  </button>
+
+  <div class="dr-sec">App</div>
+  <button class="dr-item" id="themeBtn">
+    <span class="ico">🌸</span>
+    <span><span class="t">App icon &amp; look</span><span class="d">Baby pink · white flower</span></span>
+    <span class="chev">›</span>
+  </button>
+  <button class="dr-item" id="backupBtn">
+    <span class="ico">💾</span>
+    <span><span class="t">Backup notes</span><span class="d">Export / import text</span></span>
+    <span class="chev">›</span>
+  </button>
+
+  <div class="dr-foot">Noteme v1.1<br>Long-press a note to move it 🌸</div>
+</aside>
+
+<div id="view"></div>
+<div id="modal"><div class="mk" data-close="1"></div><div class="mbox" id="mbox"></div></div>
+<div id="toast"></div>
+
+<script>
+/* ================= STATE ================= */
+const KEY = 'noteme.v1';
+let state = null;
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+function blank(type){
+  return {
+    id: uid(), type,
+    color: { h: 335, s: 45, v: 100 },
+    title:'', html:'', currency:'USD',
+    savingsTarget:0, savingsEntries:[],
+    incomes:[], expenses:[],
+    created: Date.now()
+  };
+}
+
+function loadState(){
+  let s = null;
+  try{ const raw = localStorage.getItem(KEY); if(raw) s = JSON.parse(raw); }catch(e){}
+  if(!s || !s.notes){
+    s = { notes:[
+      Object.assign(blank('text'), {
+        title:'Welcome to Noteme 🌸',
+        html:'<div>Tap the <strong>☰ menu</strong> on the left, then pick <strong>New Note</strong>.</div><div><br></div><div>Every note can be coloured any shade you like, and you can make text <strong>bold</strong>, <em>italic</em>, <u>underlined</u>, add headings, lists and check boxes.</div><div><br></div><div>Long-press a note on the home page to drag it up or down.</div>'
+      }),
+      Object.assign(blank('savings'), {
+        title:'Holiday Fund', color:{h:198,s:55,v:99},
+        currency:'USD', savingsTarget:20000,
+        savingsEntries:[{id:uid(), amt:1200, label:'First deposit', date:Date.now()}]
+      }),
+      Object.assign(blank('budget'), {
+        title:'Monthly Budget', color:{h:285,s:35,v:99},
+        currency:'USD',
+        incomes:[{id:uid(), cat:'Salary', amt:3200, date:Date.now()}],
+        expenses:[
+          {id:uid(), cat:'Housing', amt:950, date:Date.now()},
+          {id:uid(), cat:'Phone', amt:45, date:Date.now()},
+          {id:uid(), cat:'Travel', amt:120, date:Date.now()},
+          {id:uid(), cat:'Groceries', amt:310, date:Date.now()}
+        ]
+      })
+    ]};
+  }
+  return s;
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+
+/* ================= COLOUR ================= */
+function hsvToRgb(h,s,v){
+  s/=100; v/=100;
+  const c=v*s, x=c*(1-Math.abs(((h/60)%2)-1)), m=v-c;
+  let r=0,g=0,b=0;
+  if(h<60){r=c;g=x} else if(h<120){r=x;g=c} else if(h<180){g=c;b=x}
+  else if(h<240){g=x;b=c} else if(h<300){r=x;b=c} else {r=c;b=x}
+  return {r:Math.round((r+m)*255), g:Math.round((g+m)*255), b:Math.round((b+m)*255)};
+}
+function hex2(n){ const t=n.toString(16); return t.length===1?'0'+t:t; }
+function hsvToHex(h,s,v){ const c=hsvToRgb(h,s,v); return '#'+hex2(c.r)+hex2(c.g)+hex2(c.b); }
+function luma(c){ return (0.299*c.r+0.587*c.g+0.114*c.b)/255; }
+function inkOn(hsv){ return luma(hsvToRgb(hsv.h,hsv.s,hsv.v)) < 0.62 ? '#ffffff' : '#2b2230'; }
+function inkSoft(hsv){ return luma(hsvToRgb(hsv.h,hsv.s,hsv.v)) < 0.62 ? 'rgba(255,255,255,.8)' : 'rgba(43,34,48,.62)'; }
+function rgbaOf(hsv,a){ const c=hsvToRgb(hsv.h,hsv.s,hsv.v); return `rgba(${c.r},${c.g},${c.b},${a})`; }
+
+/* ================= MONEY ================= */
+const SYMB = { USD:'$', EUR:'€', MAD:'MAD', GBP:'£', JPY:'¥', CHF:'CHF', CAD:'C$', AUD:'A$', AED:'AED', SAR:'SAR', TRY:'₺', XOF:'FCFA' };
+function money(n, cur){
+  const v = Math.round(n*100)/100;
+  const s = v.toLocaleString('en-US',{minimumFractionDigits:(v%1?2:0), maximumFractionDigits:2});
+  return s + ' ' + (cur||'USD');
+}
+
+/* ================= DOM HELPERS ================= */
+const $ = s => document.querySelector(s);
+const view = $('#view');
+let currentId = null;
+function noteById(id){ return state.notes.find(n=>n.id===id); }
+function esc(s){ return (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function plainOf(html){ return (html||'').replace(/<[^>]*>/g,' ').replace(/&nbsp;/g,' ').replace(/\s+/g,' ').trim(); }
+
+/* ================= HOME + SEARCH + DRAG ================= */
+let query = '';
+let dragId = null, dragEl = null, longPressT = null, dragging = false;
+
+function matchNote(n, q){
+  if(!q) return true;
+  const hay = [n.title, plainOf(n.html), n.currency,
+    ...(n.savingsEntries||[]).map(e=>e.label),
+    ...(n.incomes||[]).map(i=>i.cat),
+    ...(n.expenses||[]).map(e=>e.cat)].join(' ').toLowerCase();
+  return hay.includes(q);
+}
+
+function hi(text, q){
+  const safe = esc(text);
+  if(!q) return safe;
+  const i = safe.toLowerCase().indexOf(q.toLowerCase());
+  if(i < 0) return safe;
+  return safe.slice(0,i) + '<mark>' + safe.slice(i, i+q.length) + '</mark>' + safe.slice(i+q.length);
+}
+
+function renderHome(){
+  const list = $('#notesList');
+  const q = query.trim().toLowerCase();
+  $('#headSub').textContent = state.notes.length + (state.notes.length===1?' note':' notes');
+  const shown = state.notes.filter(n=> matchNote(n,q));
+
+  if(!state.notes.length){
+    list.innerHTML = '<div class="empty"><div class="big">🌸</div><p>No notes yet.<br>Tap the ☰ menu, then <strong>New Note</strong>.</p></div>';
+    return;
+  }
+  if(!shown.length){
+    list.innerHTML = '<div class="empty"><div class="big">🔍</div><p>No notes match “'+esc(query)+'”.</p></div>';
+    return;
+  }
+  list.innerHTML = shown.map(n=> cardHTML(n, q)).join('');
+
+  list.querySelectorAll('[data-open]').forEach(el=>{
+    const id = el.getAttribute('data-open');
+    el.addEventListener('click', ()=>{ if(!dragging) openNote(id); });
+    attachDrag(el, id);
+  });
+}
+
+function cardHTML(n, q){
+  const bg = hsvToHex(n.color.h,n.color.s,n.color.v);
+  const fg = inkOn(n.color), fg2 = inkSoft(n.color);
+  let inner = '';
+
+  if(n.type === 'text'){
+    const plain = plainOf(n.html);
+    inner = `<div class="nc-title">${ n.title ? hi(n.title,q) : 'Untitled note' }</div>
+      <div class="nc-body">${ plain ? hi(plain.slice(0,190),q) : '<i style="opacity:.6">Empty note — tap to write</i>' }</div>`;
+  }
+
+  if(n.type === 'savings'){
+    const saved = (n.savingsEntries||[]).reduce((a,b)=>a+b.amt,0);
+    const tgt = n.savingsTarget||0;
+    const pct = tgt>0 ? Math.min(100,(saved/tgt)*100) : 0;
+    const left = Math.max(0, tgt-saved);
+    const leftPct = tgt>0 ? Math.max(0,100-pct) : 0;
+    inner = `<div class="nc-title" style="margin-bottom:10px">${ n.title ? hi(n.title,q) : 'Savings goal' }</div>
+    <div class="mini-wrap">
+      <div class="mini-gauge">${gaugeSVG(pct, fg, 74, 9)}
+        <div class="pct" style="color:${fg}">${Math.round(pct)}%</div></div>
+      <div class="mini-info">
+        <div class="mini-total" style="color:${fg}">Total : ${money(saved,n.currency)}<span style="opacity:.5">/</span>${money(tgt,n.currency)}</div>
+        <div class="mini-sub" style="color:${fg2}">${Math.round(leftPct)}% left${tgt? ' · '+money(left,n.currency)+' to go':''}</div>
+      </div>
+    </div>`;
+  }
+
+  if(n.type === 'budget'){
+    const inc = (n.incomes||[]).reduce((a,b)=>a+b.amt,0);
+    const exp = (n.expenses||[]).reduce((a,b)=>a+b.amt,0);
+    inner = `<div class="nc-title" style="margin-bottom:10px">${ n.title ? hi(n.title,q) : 'Budget' }</div>
+      <div class="bal-row"><div>
+        <div class="bal-label" style="color:${fg2}">Balance</div>
+        <div class="bal-num" style="color:${fg}">${money(inc-exp,n.currency)}</div>
+      </div></div>
+      <div class="bal-chips">
+        <span class="chip" style="color:${fg}">↑ ${money(inc,n.currency)}</span>
+        <span class="chip" style="color:${fg}">↓ ${money(exp,n.currency)}</span>
+      </div>`;
+  }
+
+  return `<div class="note-card" data-open="${n.id}" style="background:${bg};color:${fg}">
+      <div class="grip">⠿</div>
+      <div class="nc-top">
+        <span class="nc-type">${ n.type==='text'?'Note':n.type==='savings'?'Savings':'Budget' }</span>
+        <span class="spacer"></span><span class="nc-dot"></span>
+      </div>
+      ${inner}
+    </div>`;
+}
+
+function gaugeSVG(pct, stroke, size, width, track){
+  const r = size/2 - width/2 - 2;
+  const c = 2*Math.PI*r;
+  const off = c*(1-Math.max(0,Math.min(100,pct))/100);
+  return `<svg viewBox="0 0 ${size} ${size}">
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${track||'rgba(255,255,255,.5)'}" stroke-width="${width}"/>
+    <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${stroke}" stroke-width="${width}"
+      stroke-linecap="round" stroke-dasharray="${c.toFixed(1)}" stroke-dashoffset="${off.toFixed(1)}"
+      transform="rotate(-90 ${size/2} ${size/2})" style="transition:stroke-dashoffset .6s cubic-bezier(.3,.9,.3,1)"/>
+  </svg>`;
+}
+
+/* ---- drag to reorder ---- */
+function attachDrag(el, id){
+  let startY = 0, startX = 0, active = false;
+
+  const begin = (x,y,pointerId)=>{
+    startX = x; startY = y; active = true;
+    dragEl = el;
+    el.classList.add('dragging');
+    el.setPointerCapture && el.setPointerCapture(pointerId);
+  };
+  const move = (x,y)=>{
+    if(!active || !dragEl) return;
+    dragging = true;
+    dragEl.style.transform = `translateY(${y-startY}px) scale(1.03)`;
+
+    const others = [...$('#notesList').querySelectorAll('.note-card')].filter(c=>c!==dragEl);
+    for(const o of others){
+      const r = o.getBoundingClientRect();
+      if(y > r.top && y < r.bottom){
+        const after = y > r.top + r.height/2;
+        $('#notesList').insertBefore(dragEl, after ? o.nextSibling : o);
+        startY = y;
+        dragEl.style.transform = '';
+        break;
+      }
+    }
+  };
+  const end = ()=>{
+    if(!active) return;
+    active = false;
+    if(dragEl){
+      dragEl.classList.remove('dragging');
+      dragEl.style.transform = '';
+    }
+    if(dragging){
+      const order = [...$('#notesList').querySelectorAll('.note-card')].map(c=>c.getAttribute('data-open'));
+      const map = new Map(state.notes.map(n=>[n.id,n]));
+      state.notes = order.map(oid=>map.get(oid)).filter(Boolean)
+        .concat(state.notes.filter(n=>!order.includes(n.id)));
+      save(); toast('Order saved');
+    }
+    dragEl = null;
+    setTimeout(()=>{ dragging = false; }, 60);
+  };
+
+  /* long press (touch) */
+  el.addEventListener('touchstart', e=>{
+    const t = e.touches[0];
+    longPressT = setTimeout(()=>{ begin(t.clientX,t.clientY,null); navigator.vibrate && navigator.vibrate(12); }, 320);
+  }, {passive:true});
+  el.addEventListener('touchmove', e=>{
+    const t = e.touches[0];
+    if(!dragEl){ clearTimeout(longPressT); return; }
+    e.preventDefault(); move(t.clientX,t.clientY);
+  }, {passive:false});
+  el.addEventListener('touchend', ()=>{ clearTimeout(longPressT); end(); });
+
+  /* mouse drag */
+  el.addEventListener('mousedown', e=>{
+    longPressT = setTimeout(()=>{ begin(e.clientX,e.clientY,null); }, 260);
+  });
+  el.addEventListener('mousemove', e=>{ if(dragEl) move(e.clientX,e.clientY); });
+  el.addEventListener('mouseup', ()=>{ clearTimeout(longPressT); end(); });
+  el.addEventListener('mouseleave', ()=>{ clearTimeout(longPressT); if(dragEl) end(); });
+}
+
+/* search wiring */
+$('#searchInput').addEventListener('input', e=>{
+  query = e.target.value;
+  $('#searchWrap').classList.toggle('has', !!query);
+  renderHome();
+});
+$('#searchClear').onclick = ()=>{
+  query=''; $('#searchInput').value='';
+  $('#searchWrap').classList.remove('has'); renderHome();
+};
+
+/* ================= OPEN / CLOSE ================= */
+function openNote(id){
+  currentId = id;
+  const n = noteById(id); if(!n) return;
+  if(n.type==='text') renderTextNote(n);
+  else if(n.type==='savings') renderSavings(n);
+  else renderBudget(n);
+  view.classList.add('on');
+}
+function closeView(){ view.classList.remove('on'); view.innerHTML=''; currentId=null; save(); renderHome(); }
+
+/* ================= TEXT NOTE ================= */
+function renderTextNote(n){
+  const fg = inkOn(n.color);
+  view.style.background = hsvToHex(n.color.h,n.color.s,n.color.v);
+  view.style.color = fg;
+  view.innerHTML = `
+    <div class="v-head" style="color:${fg}">
+      <button class="v-btn" id="backBtn" style="color:${fg}">✕</button>
+      <div class="v-title" style="opacity:.8">NOTE</div>
+      <button class="v-btn" id="delBtn" style="color:${fg}">🗑</button>
+    </div>
+    <div class="v-scroll">
+      <input id="editorTitle" placeholder="Title" value="${esc(n.title)}" style="color:${fg}">
+      <div id="edBody" class="ed-body" contenteditable="true" data-ph="Start writing…">${n.html||''}</div>
+    </div>
+    <div id="toolbar">
+      <div class="tb-row">
+        <button class="tb b" data-cmd="bold">B</button>
+        <button class="tb i" data-cmd="italic">I</button>
+        <button class="tb u" data-cmd="underline">U</button>
+        <span class="tb sep"></span>
+        <button class="tb" data-block="H1">Header 1</button>
+        <button class="tb" data-block="H2">Header 2</button>
+        <button class="tb" data-block="DIV">Body</button>
+        <span class="tb sep"></span>
+        <button class="tb" data-cmd="insertUnorderedList">•  List</button>
+        <button class="tb" data-cmd="insertOrderedList">1. List</button>
+        <button class="tb" data-cmd="insertHTML" data-html="<div><input type=&quot;checkbox&quot; contenteditable=&quot;false&quot;>&nbsp;</div>">☑ Box</button>
+        <span class="tb sep"></span>
+        <button class="tb" data-cmd="removeFormat">Clear</button>
+        <button class="color-swatch-btn" id="colorBtn" style="background:${hsvToHex(n.color.h,n.color.s,n.color.v)}"></button>
+      </div>
+    </div>`;
+
+  const ed = $('#edBody'), title = $('#editorTitle');
+  const persist = ()=>{ n.title = title.value; n.html = ed.innerHTML; save(); };
+  title.addEventListener('input', persist);
+  ed.addEventListener('input', ()=>{ persist(); refresh(); });
+  ed.addEventListener('focus', ()=> $('#toolbar').classList.add('on'));
+  ed.addEventListener('click', ()=> $('#toolbar').classList.add('on'));
+  $('#backBtn').onclick = ()=>{ persist(); closeView(); };
+  $('#delBtn').onclick = ()=> confirmDelete(n);
+  $('#colorBtn').onclick = ()=> pickColor(n, ()=>{ persist(); renderTextNote(n); });
+
+  view.querySelectorAll('.tb').forEach(b=>{
+    b.addEventListener('mousedown', e=> e.preventDefault());
+    b.addEventListener('click', ()=>{
+      ed.focus();
+      if(b.dataset.block) document.execCommand('formatBlock', false, b.dataset.block);
+      else if(b.dataset.cmd === 'insertHTML') document.execCommand('insertHTML', false, b.dataset.html);
+      else document.execCommand(b.dataset.cmd, false, null);
+      persist(); refresh();
+    });
+  });
+  function refresh(){
+    try{
+      ['bold','italic','underline'].forEach(c=>{
+        const btn = view.querySelector(`[data-cmd="${c}"]`);
+        if(btn) btn.classList.toggle('act', document.queryCommandState(c));
+      });
+    }catch(e){}
+  }
+  setTimeout(()=>ed.focus(), 220);
+}
+
+/* ================= SAVINGS ================= */
+function renderSavings(n){
+  const c = n.color;
+  view.style.background = `linear-gradient(180deg, ${hsvToHex(c.h,c.s,c.v)} 0%, ${rgbaOf(c,.55)} 45%, #fff5fa 100%)`;
+  view.style.color = '#2b2230';
+
+  const saved = (n.savingsEntries||[]).reduce((a,b)=>a+b.amt,0);
+  const tgt = n.savingsTarget||0;
+  const pct = tgt>0 ? Math.min(100,(saved/tgt)*100) : 0;
+  const leftPct = tgt>0 ? Math.max(0,100-pct) : 0;
+  const left = Math.max(0, tgt-saved);
+  const done = tgt>0 && saved>=tgt;
+
+  const rows = (n.savingsEntries||[]).slice().sort((a,b)=>b.date-a.date).map(e=>`
+    <div class="row-item">
+      <div class="av">🌸</div>
+      <div class="mid"><div class="m1">${esc(e.label)||'Saving'}</div>
+        <div class="m2">${new Date(e.date).toLocaleDateString()}</div></div>
+      <div class="amt pos">+${money(e.amt,n.currency)}</div>
+      <button class="del-x" data-delsave="${e.id}">✕</button>
+    </div>`).join('');
+
+  view.innerHTML = `
+    <div class="v-head">
+      <button class="v-btn" id="backBtn">✕</button>
+      <div class="v-title">${esc(n.title)||'Savings goal'}</div>
+      <button class="v-btn" id="editBtn">✏️</button>
+      <button class="v-btn" id="delBtn">🗑</button>
+    </div>
+    <div class="v-scroll">
+      <div class="sheet-card tint">
+        <div class="gauge-wrap">
+          <div class="gauge-box">
+            ${gaugeSVG(pct, '#e8629b', 216, 18, '#f3e2ec')}
+            <div class="gauge-center">
+              <div class="pct" style="color:#c9457d">${Math.round(pct)}%</div>
+              <div class="lbl" style="color:#9a8fa3">${done?'Goal reached 🎉':'saved'}</div>
+              <div class="saved" style="color:#7c6f85">${money(saved,n.currency)} saved</div>
+            </div>
+          </div>
+        </div>
+        <div class="total-box">
+          <div class="total-main">Total : ${money(saved,n.currency)}<span class="sep">/</span>${money(tgt,n.currency)}</div>
+          <div class="total-left">${ done ? 'You did it! Nothing left to save.' : Math.round(leftPct)+'% left · '+money(left,n.currency)+' still needed' }</div>
+          <div class="bar-mini"><i style="width:${pct}%;background:#e8629b"></i></div>
+        </div>
+      </div>
+      <button class="btn" id="addSave">＋ Add to savings</button>
+      <div class="sec-title">Deposits (${(n.savingsEntries||[]).length})</div>
+      <div>${ rows || '<div class="empty" style="padding:26px 10px"><p>No deposits yet.</p></div>' }</div>
+    </div>`;
+
+  $('#backBtn').onclick = closeView;
+  $('#delBtn').onclick = ()=> confirmDelete(n);
+  $('#editBtn').onclick = ()=> editGoal(n);
+  $('#addSave').onclick = ()=> addSaving(n);
+  view.querySelectorAll('[data-delsave]').forEach(b=> b.onclick = ()=>{
+    n.savingsEntries = n.savingsEntries.filter(x=>x.id!==b.dataset.delsave);
+    save(); renderSavings(n); toast('Deposit removed');
+  });
+}
+
+function editGoal(n){
+  openModal(`
+    <div class="grab"></div>
+    <h3>Savings goal</h3>
+    <div class="msub">How much do you want to save in total?</div>
+    <div class="field"><label>Note title</label><input id="gTitle" value="${esc(n.title)}" placeholder="e.g. Holiday Fund"></div>
+    <div class="field"><label>Target amount</label>
+      <div class="amt-input"><span class="cur">${n.currency}</span><input id="gAmt" type="number" inputmode="decimal" value="${n.savingsTarget||''}" placeholder="20000"></div>
+    </div>
+    <div class="field"><label>Currency</label>
+      <select id="gCur">${Object.keys(SYMB).map(c=>`<option ${c===n.currency?'selected':''}>${c}</option>`).join('')}</select>
+    </div>
+    <div class="mbtns">
+      <button class="btn ghost" data-close="1">Cancel</button>
+      <button class="btn" id="gOk">OK</button>
+    </div>`, box=>{
+      box.querySelector('#gOk').onclick = ()=>{
+        n.title = box.querySelector('#gTitle').value.trim();
+        n.savingsTarget = Math.max(0, parseFloat(box.querySelector('#gAmt').value)||0);
+        n.currency = box.querySelector('#gCur').value;
+        save(); closeModal(); renderSavings(n); renderHome();
+      };
+    });
+}
+
+function addSaving(n){
+  openModal(`
+    <div class="grab"></div>
+    <h3>Add to savings</h3>
+    <div class="msub">Log what you put aside today.</div>
+    <div class="field"><label>Amount</label>
+      <div class="amt-input"><input id="aAmt" type="number" inputmode="decimal" placeholder="0"><span class="cur">${n.currency}</span></div>
+    </div>
+    <div class="field"><label>Label (optional)</label><input id="aLab" placeholder="e.g. Salary leftover"></div>
+    <div class="mbtns">
+      <button class="btn ghost" data-close="1">Cancel</button>
+      <button class="btn" id="aOk">OK</button>
+    </div>`, box=>{
+      const inp = box.querySelector('#aAmt'); setTimeout(()=>inp.focus(),250);
+      box.querySelector('#aOk').onclick = ()=>{
+        const v = parseFloat(inp.value)||0;
+        if(v<=0){ toast('Enter an amount first'); return; }
+        n.savingsEntries.push({id:uid(), amt:v, label:box.querySelector('#aLab').value.trim(), date:Date.now()});
+        save(); closeModal(); renderSavings(n); renderHome(); toast('Added '+money(v,n.currency));
+      };
+    });
+}
+
+/* ================= BUDGET ================= */
+const CATS = [
+  {k:'Housing',i:'🏠'},{k:'Debt',i:'💳'},{k:'Car',i:'🚗'},{k:'Phone',i:'📱'},
+  {k:'Travel',i:'✈️'},{k:'Food',i:'🍽'},{k:'Groceries',i:'🛒'},{k:'Health',i:'💊'},
+  {k:'Education',i:'🎓'},{k:'Clothes',i:'👗'},{k:'Fun',i:'🎬'},{k:'Bills',i:'🧾'},
+  {k:'Savings',i:'🌸'},{k:'Other',i:'📦'}
+];
+const catIcon = k => (CATS.find(c=>c.k===k)||{i:'📦'}).i;
+const PIE = ['#e8629b','#7c5cff','#3aa7e0','#2fbf8f','#f2b134','#ef6b4a','#b055d6','#5ac8c8','#8a94a6','#d4879f','#6b8e23','#c07c3a','#4d7fb8','#a0a0a0'];
+
+function renderBudget(n, mode){
+  mode = mode || 'bars';
+  view.style.background = `linear-gradient(180deg, ${hsvToHex(n.color.h,n.color.s,n.color.v)} 0%, ${rgbaOf(n.color,.5)} 40%, #fff5fa 100%)`;
+  view.style.color = '#2b2230';
+
+  const inc = (n.incomes||[]).reduce((a,b)=>a+b.amt,0);
+  const exp = (n.expenses||[]).reduce((a,b)=>a+b.amt,0);
+  const bal = inc-exp;
+
+  const incRows = (n.incomes||[]).slice().sort((a,b)=>b.date-a.date).map(e=>`
+    <div class="row-item">
+      <div class="av" style="background:#e2f7ec">💰</div>
+      <div class="mid"><div class="m1">${esc(e.cat)||'Income'}</div><div class="m2">${new Date(e.date).toLocaleDateString()}</div></div>
+      <div class="amt pos">+${money(e.amt,n.currency)}</div>
+      <button class="del-x" data-delinc="${e.id}">✕</button>
+    </div>`).join('');
+
+  const expRows = (n.expenses||[]).slice().sort((a,b)=>b.date-a.date).map(e=>`
+    <div class="row-item">
+      <div class="av">${catIcon(e.cat)}</div>
+      <div class="mid"><div class="m1">${esc(e.cat)}</div><div class="m2">${new Date(e.date).toLocaleDateString()}</div></div>
+      <div class="amt neg">−${money(e.amt,n.currency)}</div>
+      <button class="del-x" data-delexp="${e.id}">✕</button>
+    </div>`).join('');
+
+  /* aggregate by category */
+  const byCat = {};
+  (n.expenses||[]).forEach(e=>{ byCat[e.cat] = (byCat[e.cat]||0) + e.amt; });
+  const cats = Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  const max = cats.length ? cats[0][1] : 0;
+
+  const barsHTML = cats.length ? cats.map(([k,v],idx)=>`
+    <div class="cbar-row">
+      <div class="cbar-top"><span>${catIcon(k)} ${esc(k)}</span><span class="cv">${money(v,n.currency)}</span></div>
+      <div class="cbar-track"><i style="width:${max?(v/max*100):0}%;background:${PIE[idx%PIE.length]}"></i></div>
+    </div>`).join('') : '<div class="empty" style="padding:22px 8px"><p>No expenses to chart yet.</p></div>';
+
+  const donutHTML = (()=>{
+    if(!cats.length) return '<div class="empty" style="padding:22px 8px"><p>No expenses to chart yet.</p></div>';
+    let acc = 0;
+    const r = 60, c = 2*Math.PI*r;
+    const segs = cats.map(([k,v],idx)=>{
+      const frac = exp>0 ? v/exp : 0;
+      const dash = `${(frac*c).toFixed(2)} ${(c-frac*c).toFixed(2)}`;
+      const off = -(acc*c);
+      acc += frac;
+      return `<circle cx="75" cy="75" r="${r}" fill="none" stroke="${PIE[idx%PIE.length]}"
+        stroke-width="22" stroke-dasharray="${dash}" stroke-dashoffset="${off.toFixed(2)}"/>`;
+    }).join('');
+    const legend = cats.slice(0,8).map(([k,v],idx)=>`
+      <div class="leg"><i style="background:${PIE[idx%PIE.length]}"></i>
+        <span class="lname">${catIcon(k)} ${esc(k)}</span>
+        <span class="lval">${exp>0?Math.round(v/exp*100):0}%</span></div>`).join('');
+    return `<div class="donut-wrap">
+      <div class="donut">
+        <svg viewBox="0 0 150 150">${segs}</svg>
+        <div class="mid"><div class="a">${money(exp,n.currency)}</div><div class="b">spent</div></div>
+      </div>
+      <div class="legend">${legend}</div>
+    </div>`;
+  })();
+
+  view.innerHTML = `
+    <div class="v-head">
+      <button class="v-btn" id="backBtn">✕</button>
+      <div class="v-title">${esc(n.title)||'Budget'}</div>
+      <button class="v-btn" id="editBtn">✏️</button>
+      <button class="v-btn" id="delBtn">🗑</button>
+    </div>
+    <div class="v-scroll">
+
+      <div class="balance-hero">
+        <div class="lab">Balance</div>
+        <div class="num ${bal<0?'neg':''}">${money(bal,n.currency)}</div>
+        <div class="hr-row">
+          <div class="hr-box"><div class="k">Income</div><div class="v" style="color:#1f9d63">${money(inc,n.currency)}</div></div>
+          <div class="hr-box"><div class="k">Expenses</div><div class="v" style="color:#d63a70">${money(exp,n.currency)}</div></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="addInc">＋ Income</button>
+        <button class="btn soft" id="addExp">− Expenses</button>
+      </div>
+
+      <div class="sec-title">Where your money goes</div>
+      <div class="sheet-card">
+        <div class="seg">
+          <button class="${mode==='bars'?'on':''}" data-mode="bars">Bars</button>
+          <button class="${mode==='donut'?'on':''}" data-mode="donut">Donut</button>
+        </div>
+        <div class="chart">${ mode==='bars' ? barsHTML : donutHTML }</div>
+      </div>
+
+      <div class="sec-title">Income (${(n.incomes||[]).length})</div>
+      <div>${ incRows || '<div class="empty" style="padding:18px 10px"><p>No income logged.</p></div>' }</div>
+
+      <div class="sec-title">Expenses (${(n.expenses||[]).length})</div>
+      <div>${ expRows || '<div class="empty" style="padding:18px 10px"><p>No expenses logged.</p></div>' }</div>
+    </div>`;
+
+  $('#backBtn').onclick = closeView;
+  $('#delBtn').onclick = ()=> confirmDelete(n);
+  $('#editBtn').onclick = ()=> editBudgetMeta(n);
+  $('#addInc').onclick = ()=> addIncome(n);
+  $('#addExp').onclick = ()=> addExpense(n);
+  view.querySelectorAll('.seg button').forEach(b=> b.onclick = ()=> renderBudget(n, b.dataset.mode));
+  view.querySelectorAll('[data-delinc]').forEach(b=> b.onclick = ()=>{ n.incomes = n.incomes.filter(x=>x.id!==b.dataset.delinc); save(); renderBudget(n,mode); });
+  view.querySelectorAll('[data-delexp]').forEach(b=> b.onclick = ()=>{ n.expenses = n.expenses.filter(x=>x.id!==b.dataset.delexp); save(); renderBudget(n,mode); });
+}
+
+function editBudgetMeta(n){
+  openModal(`
+    <div class="grab"></div>
+    <h3>Budget settings</h3>
+    <div class="msub">Name this budget and pick your currency.</div>
+    <div class="field"><label>Title</label><input id="bTitle" value="${esc(n.title)}" placeholder="e.g. Monthly Budget"></div>
+    <div class="field"><label>Currency</label>
+      <select id="bCur">${Object.keys(SYMB).map(c=>`<option ${c===n.currency?'selected':''}>${c}</option>`).join('')}</select>
+    </div>
+    <div class="mbtns">
+      <button class="btn ghost" data-close="1">Cancel</button>
+      <button class="btn" id="bOk">OK</button>
+    </div>`, box=>{
+      box.querySelector('#bOk').onclick = ()=>{
+        n.title = box.querySelector('#bTitle').value.trim();
+        n.currency = box.querySelector('#bCur').value;
+        save(); closeModal(); renderBudget(n,'bars'); renderHome();
+      };
+    });
+}
+
+function addIncome(n){
+  openModal(`
+    <div class="grab"></div>
+    <h3>Add income</h3>
+    <div class="msub">Enter the amount you received.</div>
+    <div class="field"><label>Amount</label>
+      <div class="amt-input"><input id="iAmt" type="number" inputmode="decimal" placeholder="0"><span class="cur">${n.currency}</span></div>
+    </div>
+    <div class="field"><label>Source</label><input id="iCat" placeholder="Salary, freelance, gift…"></div>
+    <div class="mbtns">
+      <button class="btn ghost" data-close="1">Cancel</button>
+      <button class="btn" id="iOk">OK</button>
+    </div>`, box=>{
+      const inp = box.querySelector('#iAmt'); setTimeout(()=>inp.focus(),250);
+      box.querySelector('#iOk').onclick = ()=>{
+        const v = parseFloat(inp.value)||0;
+        if(v<=0){ toast('Enter an amount'); return; }
+        n.incomes.push({id:uid(), cat: box.querySelector('#iCat').value.trim()||'Income', amt:v, date:Date.now()});
+        save(); closeModal(); renderBudget(n,'bars'); renderHome(); toast('Income added');
+      };
+    });
+}
+
+function addExpense(n){
+  let chosen = null;
+  openModal(`
+    <div class="grab"></div>
+    <h3>Add expense</h3>
+    <div class="msub">Pick a category, then enter the amount.</div>
+    <div class="field"><label>Category</label>
+      <div class="cats">${CATS.map(c=>`<button class="cat" data-cat="${c.k}">${c.i} ${c.k}</button>`).join('')}</div>
+    </div>
+    <div class="field"><label>Amount</label>
+      <div class="amt-input"><input id="eAmt" type="number" inputmode="decimal" placeholder="0"><span class="cur">${n.currency}</span></div>
+    </div>
+    <div class="mbtns">
+      <button class="btn ghost" data-close="1">Cancel</button>
+      <button class="btn" id="eOk">OK</button>
+    </div>`, box=>{
+      box.querySelectorAll('.cat').forEach(b=> b.onclick = ()=>{
+        box.querySelectorAll('.cat').forEach(x=>x.classList.remove('act'));
+        b.classList.add('act'); chosen = b.dataset.cat;
+      });
+      box.querySelector('#eOk').onclick = ()=>{
+        const v = parseFloat(box.querySelector('#eAmt').value)||0;
+        if(!chosen){ toast('Choose a category first'); return; }
+        if(v<=0){ toast('Enter an amount'); return; }
+        n.expenses.push({id:uid(), cat:chosen, amt:v, date:Date.now()});
+        save(); closeModal(); renderBudget(n,'bars'); renderHome(); toast('Expense added');
+      };
+    });
+}
+
+/* ================= COLOUR PICKER ================= */
+const PRESETS = [
+  {h:335,s:70,v:100},{h:335,s:25,v:100},{h:355,s:65,v:98},{h:20,s:70,v:100},
+  {h:42,s:80,v:100},{h:60,s:55,v:100},{h:140,s:45,v:95},{h:170,s:50,v:95},
+  {h:198,s:60,v:99},{h:225,s:55,v:99},{h:262,s:50,v:99},{h:285,s:40,v:99},
+  {h:0,s:0,v:100},{h:270,s:20,v:93},{h:280,s:30,v:60},{h:300,s:45,v:35},
+  {h:220,s:35,v:30},{h:0,s:60,v:75}
+];
+
+function pickColor(n, onDone){
+  const cur = n.color || {h:335,s:45,v:100};
+  openModal(`
+    <div class="grab"></div>
+    <h3>Note colour</h3>
+    <div class="msub">Unlimited colours — drag anywhere on the square.</div>
+    <div class="picker-top">
+      <div class="preview" id="cPrev" style="background:${hsvToHex(cur.h,cur.s,cur.v)}"></div>
+      <div class="pv-meta">
+        <div class="hex" id="cHex">${hsvToHex(cur.h,cur.s,cur.v)}</div>
+        <div class="hint" id="cHint"></div>
+      </div>
+    </div>
+    <div class="sv" id="sv"><div class="knob" id="knob"></div></div>
+    <input type="range" class="hue-sl" id="hue" min="0" max="360" value="${cur.h}">
+    <div class="sl-row"><span>Hue</span><span>Drag the rainbow</span></div>
+    <div class="presets" id="presets">
+      ${PRESETS.map(p=>`<button class="preset" data-p='${JSON.stringify(p)}' style="background:${hsvToHex(p.h,p.s,p.v)}"></button>`).join('')}
+    </div>
+    <div class="mbtns" style="margin-top:18px">
+      <button class="btn ghost" data-close="1">Cancel</button>
+      <button class="btn" id="cOk">Apply</button>
+    </div>`, box=>{
+    let h=cur.h, s=cur.s, v=cur.v;
+    const sv = box.querySelector('#sv'), knob = box.querySelector('#knob'),
+          hue = box.querySelector('#hue'), prev = box.querySelector('#cPrev'),
+          hex = box.querySelector('#cHex'), hint = box.querySelector('#cHint');
+
+    function paint(){
+      sv.style.backgroundColor = hsvToHex(h,100,100);
+      knob.style.left = s+'%'; knob.style.top = (100-v)+'%';
+      knob.style.background = hsvToHex(h,s,v);
+      const hx = hsvToHex(h,s,v);
+      prev.style.background = hx; hex.textContent = hx;
+      hint.textContent = inkOn({h,s,v})==='#ffffff' ? 'Light text on this colour' : 'Dark text on this colour';
+      hue.value = h;
+    }
+    function setFromEvent(e){
+      const r = sv.getBoundingClientRect();
+      const x = e.touches ? e.touches[0].clientX : e.clientX;
+      const y = e.touches ? e.touches[0].clientY : e.clientY;
+      s = Math.max(0,Math.min(100, ((x-r.left)/r.width)*100));
+      v = Math.max(0,Math.min(100, 100-((y-r.top)/r.height)*100));
+      paint();
+    }
+    let down = false;
+    sv.addEventListener('pointerdown', e=>{ down=true; setFromEvent(e); });
+    sv.addEventListener('pointermove', e=>{ if(down){ e.preventDefault(); setFromEvent(e); } });
+    window.addEventListener('pointerup', ()=>{ down=false; });
+    hue.addEventListener('input', ()=>{ h = parseFloat(hue.value); paint(); });
+    box.querySelectorAll('.preset').forEach(p=> p.onclick = ()=>{
+      const o = JSON.parse(p.dataset.p); h=o.h; s=o.s; v=o.v; paint();
+    });
+    paint();
+    box.querySelector('#cOk').onclick = ()=>{
+      n.color = {h,s,v}; save(); closeModal(); toast('Colour applied 🌸');
+      if(onDone) onDone();
+    };
+  });
+}
+
+/* ================= DELETE ================= */
+function confirmDelete(n){
+  openModal(`
+    <div class="grab"></div>
+    <h3>Delete this note?</h3>
+    <div class="msub">“${esc(n.title)||'Untitled'}” will be removed permanently.</div>
+    <div class="mbtns">
+      <button class="btn ghost" data-close="1">Keep it</button>
+      <button class="btn" id="yDel" style="background:#e0537d">Delete</button>
+    </div>`, box=>{
+      box.querySelector('#yDel').onclick = ()=>{
+        state.notes = state.notes.filter(x=>x.id!==n.id);
+        save(); closeModal(); closeView(); toast('Note deleted');
+      };
+    });
+}
+
+/* ================= MODAL / TOAST ================= */
+const modal = $('#modal'), mbox = $('#mbox');
+function openModal(html, setup){
+  mbox.innerHTML = html;
+  modal.classList.add('on');
+  mbox.querySelectorAll('[data-close]').forEach(el=> el.onclick = closeModal);
+  modal.querySelector('.mk').onclick = closeModal;
+  if(setup) setup(mbox);
+}
+function closeModal(){ modal.classList.remove('on'); mbox.innerHTML=''; }
+
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(()=> t.classList.remove('on'), 1900);
+}
+
+/* ================= DRAWER ================= */
+const drawer = $('#drawer'), scrim = $('#scrim');
+function openDrawer(){ drawer.classList.add('on'); scrim.classList.add('on'); }
+function closeDrawer(){ drawer.classList.remove('on'); scrim.classList.remove('on'); }
+$('#menuBtn').onclick = openDrawer;
+scrim.onclick = closeDrawer;
+
+drawer.querySelectorAll('[data-new]').forEach(b=>{
+  b.onclick = ()=>{
+    const t = b.dataset.new;
+    const n = blank(t);
+    if(t==='savings'){ n.color={h:198,s:55,v:99}; }
+    if(t==='budget'){ n.color={h:285,s:35,v:99}; }
+    state.notes.unshift(n);
+    save(); closeDrawer(); renderHome();
+    if(t==='text'){ openNote(n.id); }
+    else if(t==='savings'){ openNote(n.id); setTimeout(()=>editGoal(n), 320); }
+    else { openNote(n.id); setTimeout(()=>editBudgetMeta(n), 320); }
+  };
+});
+
+$('#themeBtn').onclick = ()=>{
+  closeDrawer();
+  openModal(`
+    <div class="grab"></div>
+    <h3>App icon 🌸</h3>
+    <div class="msub">Baby pink background, white flower in the centre.</div>
+    <div style="display:flex;justify-content:center;margin:6px 0 18px">
+      <svg style="width:132px;height:132px;border-radius:30px;box-shadow:0 10px 30px rgba(206,124,166,.3)" viewBox="0 0 100 100">
+        <rect width="100" height="100" rx="24" fill="#ffd9e8"/>
+        <g fill="#ffffff">
+          <ellipse cx="50" cy="23" rx="12.5" ry="18.5"/>
+          <ellipse cx="50" cy="77" rx="12.5" ry="18.5"/>
+          <ellipse cx="23" cy="50" rx="18.5" ry="12.5"/>
+          <ellipse cx="77" cy="50" rx="18.5" ry="12.5"/>
+          <circle cx="50" cy="50" r="13" fill="#ffd9e8"/>
+          <circle cx="50" cy="50" r="8" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="msub" style="text-align:center">Use this exact mark for your App Store / Play Store icon.</div>
+    <div class="mbtns"><button class="btn" data-close="1">Close</button></div>`);
+};
+
+$('#backupBtn').onclick = ()=>{
+  closeDrawer();
+  openModal(`
+    <div class="grab"></div>
+    <h3>Backup</h3>
+    <div class="msub">Copy this text somewhere safe, or paste a backup and restore.</div>
+    <textarea id="backupBox" spellcheck="false"></textarea>
+    <div class="mbtns" style="margin-top:14px">
+      <button class="btn ghost" id="bkpCopy">Copy</button>
+      <button class="btn" id="bkpRestore">Restore</button>
+    </div>`, box=>{
+    const ta = box.querySelector('#backupBox');
+    ta.value = JSON.stringify(state);
+    box.querySelector('#bkpCopy').onclick = ()=>{
+      ta.select();
+      try{ navigator.clipboard.writeText(ta.value); toast('Backup copied'); }
+      catch(e){ try{ document.execCommand('copy'); toast('Backup copied'); }catch(_){ toast('Select & copy manually'); } }
+    };
+    box.querySelector('#bkpRestore').onclick = ()=>{
+      try{
+        const o = JSON.parse(ta.value);
+        if(!o || !Array.isArray(o.notes)) throw 0;
+        state = o; save(); closeModal(); renderHome(); toast('Notes restored');
+      }catch(e){ toast('That backup text is not valid'); }
+    };
+  });
+};
+
+/* ================= BOOT ================= */
+state = loadState();
+save();
+renderHome();
+document.addEventListener('gesturestart', e=> e.preventDefault());
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
